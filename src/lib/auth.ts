@@ -1,6 +1,6 @@
 "use client";
 
-import { redirect } from "next/navigation";
+// client-side redirect handled via window.location
 
 const TOKEN_KEY = "quizcms_token";
 
@@ -23,6 +23,6 @@ export const requireAuthClient = (loginPath = "/login") => {
   if (typeof window === "undefined") return;
   const token = getToken();
   if (!token) {
-    redirect(loginPath);
+    window.location.replace(loginPath);
   }
 };

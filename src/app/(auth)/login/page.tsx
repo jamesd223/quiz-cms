@@ -1,10 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { setToken } from "@/lib/auth";
+import { login as apiLogin } from "@/lib/api/auth";
+import { getToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    // If already authenticated, go to quizzes
+    const token = getToken();
+    if (token) {
+      router.replace("/quizzes");
+    }
+  }, [router]);
 
   return (
     <div className="min-h-svh grid place-items-center px-6 py-16">
@@ -12,10 +22,18 @@ export default function LoginPage() {
         <h1 className="mb-6 text-xl font-semibold">Sign in</h1>
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            setToken("mock-token");
-            router.replace("/quizzes");
+            const form = new FormData(e.currentTarget as HTMLFormElement);
+            const email = String(form.get("email") ?? "");
+            const password = String(form.get("password") ?? "");
+            try {
+              await apiLogin(email, password);
+              router.replace("/quizzes");
+            } catch (err) {
+              console.error(err);
+              alert("Sign-in failed. Check API availability.");
+            }
           }}
         >
           <div className="space-y-2">
@@ -23,7 +41,9 @@ export default function LoginPage() {
             <input
               type="email"
               className="w-full rounded-md bg-neutral-800 px-3 py-2 text-sm outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500"
-              placeholder="you@example.com"
+              placeholder="admin@yourdomain.com"
+              defaultValue="admin@yourdomain.com"
+              name="email"
             />
           </div>
           <div className="space-y-2">
@@ -31,7 +51,9 @@ export default function LoginPage() {
             <input
               type="password"
               className="w-full rounded-md bg-neutral-800 px-3 py-2 text-sm outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500"
-              placeholder="Your password"
+              placeholder="Admin123!"
+              defaultValue="Admin123!"
+              name="password"
             />
           </div>
           <button

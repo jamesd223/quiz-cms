@@ -1,0 +1,2149 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Quiz CMS API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "refreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refresh_token"
+      }
+    },
+    "schemas": {
+      "Media": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["icon", "image", "logo", "avatar"]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "alt": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "height": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "locale": {
+            "type": "string"
+          }
+        },
+        "required": ["type", "url"]
+      },
+      "Brand": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["name"]
+      },
+      "Quiz": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "brand_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "locale_default": {
+            "type": "string"
+          },
+          "progress_style": {
+            "type": "string"
+          },
+          "show_trust_strip": {
+            "type": "boolean"
+          },
+          "show_seen_on": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"],
+            "default": "draft"
+          }
+        },
+        "required": ["brand_id", "slug", "title"]
+      },
+      "QuizVersion": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "quiz_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "traffic_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": ["quiz_id", "label"]
+      },
+      "Step": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "quiz_version_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "footnote_text": {
+            "type": "string"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "layout": {
+            "type": "string"
+          },
+          "media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "default": 1
+          },
+          "grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "grid_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["quiz_version_id", "order_index"]
+      },
+      "Field": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "step_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "help_text": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "choice_single",
+              "choice_multi",
+              "input_text",
+              "input_number",
+              "input_email",
+              "input_phone",
+              "date",
+              "slider",
+              "group"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "input_mask": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "validation_regex": {
+            "type": "string"
+          },
+          "validation_message": {
+            "type": "string"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_layout_mode": {
+            "type": "string"
+          },
+          "container_grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "randomize_options": {
+            "type": "boolean",
+            "default": false
+          },
+          "value_format": {
+            "type": "string"
+          },
+          "default_value": {}
+        },
+        "required": ["step_id", "order_index", "key", "type"]
+      },
+      "Option": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "icon_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "image_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          },
+          "score": {
+            "type": "number"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": ["field_id", "order_index", "value"]
+      },
+      "GroupedInput": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "field_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "input_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": ["field_id", "order_index", "field_key", "input_type"]
+      },
+      "Submission": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "quiz_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "version_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "answers": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "ua": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string"
+              },
+              "ip": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": ["quiz_id", "version_label", "answers"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "editor", "viewer"]
+          },
+          "lastLoginAt": {
+            "type": ["string", "null"],
+            "format": "date"
+          }
+        },
+        "required": ["email", "password_hash", "role"]
+      },
+      "BrandCreate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["name"]
+      },
+      "QuizCreate": {
+        "type": "object",
+        "properties": {
+          "brand_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "locale_default": {
+            "type": "string"
+          },
+          "progress_style": {
+            "type": "string"
+          },
+          "show_trust_strip": {
+            "type": "boolean"
+          },
+          "show_seen_on": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"],
+            "default": "draft"
+          }
+        },
+        "required": ["brand_id", "slug", "title"]
+      },
+      "QuizUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "brand_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "locale_default": {
+            "type": "string"
+          },
+          "progress_style": {
+            "type": "string"
+          },
+          "show_trust_strip": {
+            "type": "boolean"
+          },
+          "show_seen_on": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"],
+            "default": "draft"
+          }
+        }
+      },
+      "VersionCreate": {
+        "type": "object",
+        "properties": {
+          "quiz_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "traffic_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": ["quiz_id", "label"]
+      },
+      "VersionUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "quiz_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "traffic_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "StepCreate": {
+        "type": "object",
+        "properties": {
+          "quiz_version_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "footnote_text": {
+            "type": "string"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "layout": {
+            "type": "string"
+          },
+          "media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "default": 1
+          },
+          "grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "grid_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["quiz_version_id", "order_index"]
+      },
+      "StepUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "quiz_version_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "footnote_text": {
+            "type": "string"
+          },
+          "cta_text": {
+            "type": "string"
+          },
+          "layout": {
+            "type": "string"
+          },
+          "media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "default": 1
+          },
+          "grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "grid_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "FieldCreate": {
+        "type": "object",
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "help_text": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "choice_single",
+              "choice_multi",
+              "input_text",
+              "input_number",
+              "input_email",
+              "input_phone",
+              "date",
+              "slider",
+              "group"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "input_mask": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "validation_regex": {
+            "type": "string"
+          },
+          "validation_message": {
+            "type": "string"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_layout_mode": {
+            "type": "string"
+          },
+          "container_grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "randomize_options": {
+            "type": "boolean",
+            "default": false
+          },
+          "value_format": {
+            "type": "string"
+          },
+          "default_value": {}
+        },
+        "required": ["step_id", "order_index", "key", "type"]
+      },
+      "FieldUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "step_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "help_text": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "choice_single",
+              "choice_multi",
+              "input_text",
+              "input_number",
+              "input_email",
+              "input_phone",
+              "date",
+              "slider",
+              "group"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "input_mask": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "validation_regex": {
+            "type": "string"
+          },
+          "validation_message": {
+            "type": "string"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_layout_mode": {
+            "type": "string"
+          },
+          "container_grid_columns": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_grid_rows": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "container_gap_px": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "randomize_options": {
+            "type": "boolean",
+            "default": false
+          },
+          "value_format": {
+            "type": "string"
+          },
+          "default_value": {}
+        }
+      },
+      "OptionCreate": {
+        "type": "object",
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "icon_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "image_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          },
+          "score": {
+            "type": "number"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": ["field_id", "order_index", "value"]
+      },
+      "OptionUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "label": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "icon_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "image_media_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          },
+          "score": {
+            "type": "number"
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        }
+      },
+      "GroupedInputCreate": {
+        "type": "object",
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "field_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "input_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": ["field_id", "order_index", "field_key", "input_type"]
+      },
+      "GroupedInputUpdate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "field_id": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$"
+          },
+          "order_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "field_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string"
+          },
+          "input_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": false
+          },
+          "row_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "col_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "row_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "col_span": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        }
+      },
+      "AssembledQuiz": {
+        "type": "object",
+        "properties": {
+          "quiz": {
+            "$ref": "#/components/schemas/Quiz"
+          },
+          "version": {
+            "$ref": "#/components/schemas/QuizVersion"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Step"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            }
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            }
+          },
+          "grouped_inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupedInput"
+            }
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            }
+          }
+        },
+        "required": [
+          "quiz",
+          "version",
+          "steps",
+          "fields",
+          "options",
+          "grouped_inputs"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/v1/quizzes/{slug}": {
+      "get": {
+        "summary": "Get assembled quiz by slug",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "slug",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "version",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "seed",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assembled quiz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssembledQuiz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quizzes/{id}/versions": {
+      "get": {
+        "summary": "List versions for a quiz",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Versions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "traffic_weight": {
+                            "type": "integer"
+                          },
+                          "is_default": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["label", "traffic_weight", "is_default"]
+                      }
+                    }
+                  },
+                  "required": ["items"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/brands": {
+      "get": {
+        "summary": "List brands",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create brand",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/brands/{id}": {
+      "patch": {
+        "summary": "Update brand",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/media": {
+      "get": {
+        "summary": "List media",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload media (multipart)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/media/{id}": {
+      "delete": {
+        "summary": "Delete media",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/quizzes": {
+      "get": {
+        "summary": "List quizzes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create quiz",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/quizzes/{id}": {
+      "get": {
+        "summary": "Get quiz",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update quiz",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/versions": {
+      "post": {
+        "summary": "Create version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/versions/{id}": {
+      "patch": {
+        "summary": "Update version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/versions/quiz/{quizId}": {
+      "get": {
+        "summary": "List versions by quiz",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "quizId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/steps/version/{versionId}": {
+      "get": {
+        "summary": "List steps by version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "versionId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/steps": {
+      "post": {
+        "summary": "Create step",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/steps/{id}": {
+      "patch": {
+        "summary": "Update step",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete step",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/fields/step/{stepId}": {
+      "get": {
+        "summary": "List fields by step",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "stepId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/fields": {
+      "post": {
+        "summary": "Create field",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/fields/{id}": {
+      "patch": {
+        "summary": "Update field",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete field",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/options/field/{fieldId}": {
+      "get": {
+        "summary": "List options by field",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "fieldId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/options": {
+      "post": {
+        "summary": "Create option",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/options/{id}": {
+      "patch": {
+        "summary": "Update option",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete option",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/grouped-inputs/field/{fieldId}": {
+      "get": {
+        "summary": "List grouped inputs by field",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "fieldId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/grouped-inputs": {
+      "post": {
+        "summary": "Create grouped input",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/v1/grouped-inputs/{id}": {
+      "patch": {
+        "summary": "Update grouped input",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete grouped input",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/v1/submissions": {
+      "post": {
+        "summary": "Create a submission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Submission"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "summary": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["access_token"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "summary": "Refresh",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "summary": "Logout",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
