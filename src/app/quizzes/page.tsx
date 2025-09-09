@@ -70,7 +70,7 @@ export default function QuizzesPage() {
 
   return (
     <div className="px-6 py-6">
-      <div className="sticky top-0 z-10 -mx-6 border-b border-white/10 bg-neutral-950/80 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
+      <div className="sticky top-0 z-10 -mx-6 border-b border-white/10 bg-neutral-950/70 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-lg font-semibold">Quizzes</h1>
           <div className="flex items-center gap-2">
@@ -85,7 +85,7 @@ export default function QuizzesPage() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2 rounded-xl bg-neutral-900/60 p-4 shadow-lg ring-1 ring-white/10">
+        <div className="xl:col-span-2 rounded-xl bg-neutral-900/50 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ring-1 ring-white/10">
           <div className="mb-3 text-sm text-neutral-400">
             {isLoading ? "Loading..." : `${rows.length} results`}
           </div>
@@ -136,7 +136,7 @@ export default function QuizzesPage() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-neutral-900/60 p-4 shadow-lg ring-1 ring-white/10">
+        <div className="rounded-xl bg-neutral-900/50 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ring-1 ring-white/10">
           <h2 className="mb-3 text-sm font-medium text-neutral-200">
             Create new quiz
           </h2>

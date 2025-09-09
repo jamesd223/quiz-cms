@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { type Field } from "@/types/quiz";
 
 export const useQuiz = (id: string) => {
   return useQuery({
@@ -34,7 +35,7 @@ export const useQuiz = (id: string) => {
             };
             gridColumns: number;
             gridGapPx: number;
-            fields: any[];
+            fields: Field[];
           }>;
         }>;
       }>;

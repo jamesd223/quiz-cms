@@ -1,8 +1,10 @@
-import { ReactNode } from "react";
 import Link from "next/link";
 
-export default function QuizLayout({ children, params }: { children: ReactNode; params: { id: string } }) {
-  const { id } = params;
+export default async function QuizLayout({
+  children,
+  params,
+}: LayoutProps<"/quizzes/[id]">) {
+  const { id } = await params;
   const tabs = [
     { href: `/quizzes/${id}`, label: "Versions" },
     { href: `/quizzes/${id}/steps`, label: "Steps" },
@@ -11,7 +13,7 @@ export default function QuizLayout({ children, params }: { children: ReactNode; 
   ];
   return (
     <div>
-      <div className="sticky top-0 z-10 -mx-6 border-b border-white/10 bg-neutral-950/80 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60">
+      <div className="sticky top-0 z-10 -mx-6 border-b border-white/10 bg-neutral-950/70 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
         <div className="flex items-center justify-between gap-4">
           <div className="text-sm text-neutral-300">Quiz</div>
           <div className="flex items-center gap-1">
@@ -19,7 +21,7 @@ export default function QuizLayout({ children, params }: { children: ReactNode; 
               <Link
                 key={t.href}
                 href={t.href}
-                className="rounded-md px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800/70"
+                className="rounded-md px-3 py-1.5 text-sm text-neutral-300 hover:bg-white/10"
               >
                 {t.label}
               </Link>
@@ -31,5 +33,3 @@ export default function QuizLayout({ children, params }: { children: ReactNode; 
     </div>
   );
 }
-
-

@@ -11,7 +11,7 @@ export default function QuizzesRootLayout({
   return (
     <ClientAuthGate>
       <div className="grid min-h-svh grid-cols-[240px_1fr]">
-        <aside className="border-r border-white/10 bg-neutral-950/80 p-4">
+        <aside className="border-r border-white/10 bg-neutral-950/70 p-4 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/50">
           <div className="mb-6 text-sm font-semibold text-neutral-200">
             Quiz CMS
           </div>
@@ -27,7 +27,7 @@ export default function QuizzesRootLayout({
             ))}
           </nav>
         </aside>
-        <main>{children}</main>
+        <main className="[&_.card]:glass-panel">{children}</main>
       </div>
     </ClientAuthGate>
   );

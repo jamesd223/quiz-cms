@@ -2,11 +2,12 @@
   "name": "quiz-cms",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "pnpm exec next dev --turbopack",
+    "build": "pnpm exec next build --turbopack",
+    "start": "pnpm exec next start",
+    "lint": "pnpm exec eslint"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",
@@ -29,7 +30,6 @@
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "0.542.0",
-    "msw": "2.11.1",
     "next": "15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",

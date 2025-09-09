@@ -11,17 +11,29 @@ export default function StepEditorPage() {
   const id = params.id as string;
   const stepId = params.stepId as string;
   const { data } = useQuiz(id);
-  const version = useMemo(() => data?.versions.find((v) => v.isDefault) ?? data?.versions[0], [data]);
-  const step = useMemo<Step | undefined>(() => version?.steps.find((s) => s.id === stepId), [version, stepId]);
+  const version = useMemo(
+    () => data?.versions.find((v) => v.isDefault) ?? data?.versions[0],
+    [data]
+  );
+  const step = useMemo<Step | undefined>(
+    () => version?.steps.find((s) => s.id === stepId),
+    [version, stepId]
+  );
   const qc = useQueryClient();
 
   const updateGrid = useMutation({
-    mutationFn: async (payload: { gridColumns?: number; gridGapPx?: number }) => {
-      const res = await fetch(`/api/quizzes/${id}/versions/${version!.id}/steps/${stepId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    mutationFn: async (payload: {
+      gridColumns?: number;
+      gridGapPx?: number;
+    }) => {
+      const res = await fetch(
+        `/api/quizzes/${id}/versions/${version!.id}/steps/${stepId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
       if (!res.ok) throw new Error("Failed to update grid");
       return res.json();
     },
@@ -36,13 +48,18 @@ export default function StepEditorPage() {
 
   if (!step) return <div>Step not found</div>;
 
-  const collisions = detectGridCollisions(step.fields as Field[], step.gridColumns);
+  const collisions = detectGridCollisions(
+    step.fields as Field[],
+    step.gridColumns
+  );
 
   return (
     <div className="space-y-4">
       <div className="flex items-end gap-4">
         <div>
-          <div className="text-sm font-medium text-neutral-200">Grid columns</div>
+          <div className="text-sm font-medium text-neutral-200">
+            Grid columns
+          </div>
           <input
             type="number"
             min={1}
@@ -54,7 +71,9 @@ export default function StepEditorPage() {
           />
         </div>
         <div>
-          <div className="text-sm font-medium text-neutral-200">Grid gap (px)</div>
+          <div className="text-sm font-medium text-neutral-200">
+            Grid gap (px)
+          </div>
           <input
             type="number"
             min={0}
@@ -79,27 +98,43 @@ export default function StepEditorPage() {
           tabIndex={0}
           onKeyDown={(e) => {
             if (!selectedFieldId) return;
-            const idx = step.fields.findIndex((ff) => ff.id === selectedFieldId);
+            const idx = step.fields.findIndex(
+              (ff) => ff.id === selectedFieldId
+            );
             if (idx < 0) return;
             const f = step.fields[idx];
             const next = { ...f, position: { ...f.position } } as Field;
-            if (e.key === "ArrowLeft") next.position.col = Math.max(1, next.position.col - 1);
-            if (e.key === "ArrowRight") next.position.col = Math.min(step.gridColumns, next.position.col + 1);
-            if (e.key === "ArrowUp") next.position.row = Math.max(1, next.position.row - 1);
-            if (e.key === "ArrowDown") next.position.row = Math.max(1, next.position.row + 1);
+            if (e.key === "ArrowLeft")
+              next.position.col = Math.max(1, next.position.col - 1);
+            if (e.key === "ArrowRight")
+              next.position.col = Math.min(
+                step.gridColumns,
+                next.position.col + 1
+              );
+            if (e.key === "ArrowUp")
+              next.position.row = Math.max(1, next.position.row - 1);
+            if (e.key === "ArrowDown")
+              next.position.row = Math.max(1, next.position.row + 1);
             const other = step.fields.filter((x) => x.id !== f.id);
-            const hasCollision = detectGridCollisions([next, ...other], step.gridColumns).length > 0;
+            const hasCollision =
+              detectGridCollisions([next, ...other], step.gridColumns).length >
+              0;
             if (hasCollision) {
               setWarning("Move blocked: collision detected");
               return;
             }
             setWarning(null);
             void updateGrid.mutateAsync({}).then(async () => {
-              await fetch(`/api/quizzes/${id}/versions/${version!.id}/steps/${stepId}/fields/${f.id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ position: next.position }),
-              });
+              await fetch(
+                `/api/quizzes/${id}/versions/${
+                  version!.id
+                }/steps/${stepId}/fields/${f.id}`,
+                {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ position: next.position }),
+                }
+              );
               void qc.invalidateQueries({ queryKey: ["quiz", id] });
             });
           }}
@@ -113,7 +148,7 @@ export default function StepEditorPage() {
             <div
               key={f.id}
               onClick={() => setSelectedFieldId(f.id)}
-              onPointerDown={(e) => {
+              onPointerDown={() => {
                 const onUp = async (up: PointerEvent) => {
                   window.removeEventListener("pointerup", onUp);
                   if (!gridRef.current) return;
@@ -122,9 +157,19 @@ export default function StepEditorPage() {
                   const relY = up.clientY - rect.top;
                   const totalCols = step.gridColumns;
                   const gapPx = step.gridGapPx;
-                  const colWidth = (rect.width - gapPx * (totalCols - 1)) / totalCols;
-                  const col = Math.max(1, Math.min(totalCols, Math.floor(relX / (colWidth + gapPx)) + 1));
-                  const row = Math.max(1, Math.floor(relY / (colWidth + gapPx)) + 1);
+                  const colWidth =
+                    (rect.width - gapPx * (totalCols - 1)) / totalCols;
+                  const col = Math.max(
+                    1,
+                    Math.min(
+                      totalCols,
+                      Math.floor(relX / (colWidth + gapPx)) + 1
+                    )
+                  );
+                  const row = Math.max(
+                    1,
+                    Math.floor(relY / (colWidth + gapPx)) + 1
+                  );
                   const next = {
                     ...f,
                     position: {
@@ -134,17 +179,24 @@ export default function StepEditorPage() {
                     },
                   } as Field;
                   const other = step.fields.filter((x) => x.id !== f.id);
-                  const hasCollision = detectGridCollisions([next, ...other], step.gridColumns).length > 0;
+                  const hasCollision =
+                    detectGridCollisions([next, ...other], step.gridColumns)
+                      .length > 0;
                   if (hasCollision) {
                     setWarning("Drop blocked: collision detected");
                     return;
                   }
                   setWarning(null);
-                  await fetch(`/api/quizzes/${id}/versions/${version!.id}/steps/${stepId}/fields/${f.id}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ position: next.position }),
-                  });
+                  await fetch(
+                    `/api/quizzes/${id}/versions/${
+                      version!.id
+                    }/steps/${stepId}/fields/${f.id}`,
+                    {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ position: next.position }),
+                    }
+                  );
                   void qc.invalidateQueries({ queryKey: ["quiz", id] });
                 };
                 window.addEventListener("pointerup", onUp, { once: true });
@@ -167,5 +219,3 @@ export default function StepEditorPage() {
     </div>
   );
 }
-
-
