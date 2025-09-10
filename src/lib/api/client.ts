@@ -1,6 +1,7 @@
 "use client";
 
 import { getToken, setToken, clearToken } from "@/lib/auth";
+import { getQueryClient } from "@/lib/queryClient";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
@@ -91,7 +92,20 @@ export const apiFetch = async <T = unknown>(
 
   if (!res.ok) {
     const body = await tryParse(res);
-    if (res.status === 401) clearToken();
+    if (res.status === 401) {
+      clearToken();
+      try {
+        getQueryClient().clear();
+      } catch {}
+      if (typeof window !== "undefined") {
+        // Redirect to login per spec
+        const current = window.location.pathname + window.location.search;
+        const target = `/login?next=${encodeURIComponent(current)}`;
+        if (window.location.pathname !== "/login") {
+          window.location.replace(target);
+        }
+      }
+    }
     throw new ApiError(`Request failed with ${res.status}`, res.status, body);
   }
 

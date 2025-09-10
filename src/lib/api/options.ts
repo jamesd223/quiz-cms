@@ -63,3 +63,17 @@ export const updateOption = async (
 export const deleteOption = async (id: string): Promise<void> => {
   await apiFetch(`/v1/options/${id}`, { method: "DELETE", parseJson: false });
 };
+
+export const getOption = async (id: string): Promise<Option | undefined> => {
+  const res = await apiFetch<Option | { option?: Option } | undefined>(
+    `/v1/options/${id}`,
+    { method: "GET" }
+  );
+  if (!res) return undefined;
+  if (typeof res === "object" && res && !Array.isArray(res)) {
+    const obj = res as Record<string, unknown>;
+    const maybe = obj["option"];
+    if (maybe && typeof maybe === "object") return maybe as Option;
+  }
+  return res as Option;
+};

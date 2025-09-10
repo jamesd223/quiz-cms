@@ -74,3 +74,20 @@ export const deleteGroupedInput = async (id: string): Promise<void> => {
     parseJson: false,
   });
 };
+
+export const getGroupedInput = async (
+  id: string
+): Promise<GroupedInput | undefined> => {
+  const res = await apiFetch<
+    GroupedInput | { grouped_input?: GroupedInput } | undefined
+  >(`/v1/grouped-inputs/${id}`, {
+    method: "GET",
+  });
+  if (!res) return undefined;
+  if (typeof res === "object" && res && !Array.isArray(res)) {
+    const obj = res as Record<string, unknown>;
+    const maybe = (obj as { grouped_input?: unknown }).grouped_input;
+    if (maybe && typeof maybe === "object") return maybe as GroupedInput;
+  }
+  return res as GroupedInput;
+};

@@ -52,3 +52,17 @@ export const updateVersion = async (
   });
   return res;
 };
+
+export const getVersion = async (id: string): Promise<Version | undefined> => {
+  const res = await apiFetch<Version | { version?: Version } | undefined>(
+    `/v1/versions/${id}`,
+    { method: "GET" }
+  );
+  if (!res) return undefined;
+  if (typeof res === "object" && res && !Array.isArray(res)) {
+    const obj = res as Record<string, unknown>;
+    const maybe = obj["version"];
+    if (maybe && typeof maybe === "object") return maybe as Version;
+  }
+  return res as Version;
+};

@@ -61,3 +61,17 @@ export const updateStep = async (
 export const deleteStep = async (id: string): Promise<void> => {
   await apiFetch(`/v1/steps/${id}`, { method: "DELETE", parseJson: false });
 };
+
+export const getStep = async (id: string): Promise<Step | undefined> => {
+  const res = await apiFetch<Step | { step?: Step } | undefined>(
+    `/v1/steps/${id}`,
+    { method: "GET" }
+  );
+  if (!res) return undefined;
+  if (typeof res === "object" && res && !Array.isArray(res)) {
+    const obj = res as Record<string, unknown>;
+    const maybe = obj["step"];
+    if (maybe && typeof maybe === "object") return maybe as Step;
+  }
+  return res as Step;
+};

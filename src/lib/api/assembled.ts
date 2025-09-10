@@ -22,7 +22,8 @@ export const getAssembledQuizBySlug = async (
   const res = await apiFetch<AssembledQuiz>(
     `/v1/quizzes/${encodeURIComponent(slug)}${
       qs.toString() ? `?${qs.toString()}` : ""
-    }`
+    }`,
+    { auth: false }
   );
   return res;
 };

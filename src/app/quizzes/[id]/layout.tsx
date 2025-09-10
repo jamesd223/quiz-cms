@@ -6,10 +6,10 @@ export default async function QuizLayout({
 }: LayoutProps<"/quizzes/[id]">) {
   const { id } = await params;
   const tabs = [
-    { href: `/quizzes/${id}`, label: "Versions" },
-    { href: `/quizzes/${id}/steps`, label: "Steps" },
-    { href: `/quizzes/${id}/fields`, label: "Fields" },
-    { href: `/quizzes/${id}/media`, label: "Media" },
+    { href: `/quizzes/${id}`, label: "Overview" },
+    { href: `/quizzes/${id}/versions`, label: "Versions" },
+    { href: `/quizzes/${id}/versions`, label: "Steps" },
+    { href: `/media`, label: "Media" },
   ];
   return (
     <div>

@@ -84,3 +84,17 @@ export const updateField = async (
 export const deleteField = async (id: string): Promise<void> => {
   await apiFetch(`/v1/fields/${id}`, { method: "DELETE", parseJson: false });
 };
+
+export const getField = async (id: string): Promise<Field | undefined> => {
+  const res = await apiFetch<Field | { field?: Field } | undefined>(
+    `/v1/fields/${id}`,
+    { method: "GET" }
+  );
+  if (!res) return undefined;
+  if (typeof res === "object" && res && !Array.isArray(res)) {
+    const obj = res as Record<string, unknown>;
+    const maybe = obj["field"];
+    if (maybe && typeof maybe === "object") return maybe as Field;
+  }
+  return res as Field;
+};

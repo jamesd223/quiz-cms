@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/api/client";
+import { getToken } from "@/lib/auth";
 
 export type Media = {
   _id: string;
@@ -37,6 +38,10 @@ export const uploadMedia = async (
       method: "POST",
       body: form,
       credentials: "include",
+      headers: (() => {
+        const token = getToken();
+        return token ? { Authorization: `Bearer ${token}` } : undefined;
+      })(),
     }
   );
   if (!res.ok) return undefined;
