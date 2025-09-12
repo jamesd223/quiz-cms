@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
+// import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { listQuizzes, type Quiz } from "@/lib/api/quizzes";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { listQuizzes, deleteQuiz, type Quiz } from "@/lib/api/quizzes";
 import { TextInput as Input } from "@/components/ui/text-input";
+import { Button } from "@/components/ui/button";
 
 export default function QuizzesPage() {
+  const router = useRouter();
+  const qc = useQueryClient();
   const [query, setQuery] = useState("");
   const { data, isLoading, isError } = useQuery<Quiz[]>({
     queryKey: ["quizzes"],
@@ -21,6 +25,12 @@ export default function QuizzesPage() {
       ),
     [data, query]
   );
+  const remove = useMutation({
+    mutationFn: async (id: string) => deleteQuiz(id),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["quizzes"] });
+    },
+  });
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
@@ -40,12 +50,9 @@ export default function QuizzesPage() {
               placeholder="Search quizzes..."
               className="h-9 w-64"
             />
-            <Link
-              href="/quizzes/new"
-              className="rounded-md bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-400"
-            >
+            <Button onClick={() => router.push("/quizzes/new")}>
               New quiz
-            </Link>
+            </Button>
           </div>
         </div>
         <div className="overflow-hidden rounded-md ring-1 ring-white/10">
@@ -64,17 +71,29 @@ export default function QuizzesPage() {
                   key={q._id}
                   className="border-t border-white/10 hover:bg-neutral-900/50"
                 >
-                  <td className="px-3 py-2">
-                    <Link
-                      href={`/quizzes/${q._id}`}
-                      className="text-indigo-300 hover:underline"
-                    >
-                      {q.title}
-                    </Link>
-                  </td>
+                  <td className="px-3 py-2">{q.title}</td>
                   <td className="px-3 py-2">{q.slug}</td>
                   <td className="px-3 py-2 capitalize">{q.status}</td>
                   <td className="px-3 py-2 text-neutral-400">{q.brand_id}</td>
+                  <td className="px-3 py-2 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="secondary"
+                        onClick={() => router.push(`/quizzes/${q._id}`)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          if (confirm("Delete this quiz?"))
+                            remove.mutate(q._id);
+                        }}
+                        disabled={remove.isPending}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

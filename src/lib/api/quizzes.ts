@@ -76,3 +76,7 @@ export const updateQuiz = async (
   });
   return res;
 };
+
+export const deleteQuiz = async (id: string): Promise<void> => {
+  await apiFetch(`/v1/quizzes/${id}`, { method: "DELETE", parseJson: false });
+};

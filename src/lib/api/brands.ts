@@ -34,3 +34,7 @@ export const updateBrand = async (
   });
   return res;
 };
+
+export const deleteBrand = async (id: string): Promise<void> => {
+  await apiFetch(`/v1/brands/${id}`, { method: "DELETE", parseJson: false });
+};

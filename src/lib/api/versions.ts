@@ -66,3 +66,7 @@ export const getVersion = async (id: string): Promise<Version | undefined> => {
   }
   return res as Version;
 };
+
+export const deleteVersion = async (id: string): Promise<void> => {
+  await apiFetch(`/v1/versions/${id}`, { method: "DELETE", parseJson: false });
+};

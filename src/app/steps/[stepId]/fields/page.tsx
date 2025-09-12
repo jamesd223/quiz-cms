@@ -122,8 +122,8 @@ export default function StepFieldsPage() {
         <table className="w-full text-sm">
           <thead className="bg-neutral-900/60 text-neutral-300">
             <tr>
-              <th className="px-3 py-2 text-left font-medium">Order</th>
               <th className="px-3 py-2 text-left font-medium">Key</th>
+              <th className="px-3 py-2 text-left font-medium">Label</th>
               <th className="px-3 py-2 text-left font-medium">Type</th>
               <th className="px-3 py-2 text-left font-medium">Visible</th>
               <th className="px-3 py-2 text-left font-medium">Row/Col/Span</th>
@@ -135,19 +135,14 @@ export default function StepFieldsPage() {
               <tr key={f._id} className="border-t border-white/10">
                 <td className="px-3 py-2">
                   <Input
-                    type="number"
-                    defaultValue={f.order_index}
-                    onBlur={(e) =>
-                      safeUpdate(f, { order_index: Number(e.target.value) })
-                    }
-                    className="w-24"
-                  />
-                </td>
-                <td className="px-3 py-2">
-                  <Input
                     defaultValue={f.key}
                     onBlur={(e) => safeUpdate(f, { key: e.target.value })}
                   />
+                </td>
+                <td className="px-3 py-2">
+                  {f.label ?? (
+                    <span className="text-neutral-500">(no label)</span>
+                  )}
                 </td>
                 <td className="px-3 py-2 text-neutral-400">{f.type}</td>
                 <td className="px-3 py-2">

@@ -40,7 +40,7 @@ export default function NewFieldPage() {
   });
 
   return (
-    <div className="max-w-xl space-y-4">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="rounded-xl bg-neutral-900/50 p-4 ring-1 ring-white/10">
         <h2 className="mb-3 text-sm font-medium text-neutral-200">New field</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -106,7 +106,7 @@ export default function NewFieldPage() {
             />
           </label>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 flex justify-end">
           <Button
             onClick={() => create.mutate()}
             disabled={!key || !label || create.isPending}

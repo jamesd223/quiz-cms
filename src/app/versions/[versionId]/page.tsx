@@ -32,12 +32,12 @@ export default function VersionSettingsPage() {
   if (isError || !data) return <div>Not found</div>;
 
   return (
-    <div className="max-w-xl space-y-4">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="rounded-xl bg-neutral-900/50 p-4 ring-1 ring-white/10">
         <h2 className="mb-3 text-sm font-medium text-neutral-200">Version</h2>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
-            <span className="text-neutral-300">Label</span>
+            <span className="text-neutral-300">Version name</span>
             <Input
               defaultValue={data.label}
               onBlur={(e) => save.mutate({ label: e.target.value })}
@@ -55,7 +55,7 @@ export default function VersionSettingsPage() {
               }
             />
           </label>
-          <label className="inline-flex items-center gap-2 text-sm text-neutral-300">
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-300 md:col-span-2">
             <input
               type="checkbox"
               defaultChecked={data.is_default}

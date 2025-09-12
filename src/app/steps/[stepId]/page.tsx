@@ -3,7 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStep, updateStep, type Step } from "@/lib/api/steps";
-import { listFieldsByStep, type Field } from "@/lib/api/fields";
+import { listFieldsByStep, deleteField, type Field } from "@/lib/api/fields";
 import { useMemo } from "react";
 import { TextInput as Input } from "@/components/ui/text-input";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,14 @@ export default function StepEditorPage() {
     },
   });
 
+  const removeField = useMutation({
+    mutationFn: async (fieldIdToDelete: string) => deleteField(fieldIdToDelete),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["fields", stepId] });
+      router.refresh();
+    },
+  });
+
   const mediaParam = search.get("media_id");
   if (mediaParam && step && step.media_id !== mediaParam) {
     // apply once when arriving from media attach
@@ -49,7 +57,7 @@ export default function StepEditorPage() {
   if (isError || !step) return <div>Not found</div>;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="space-y-4">
         <div className="rounded-xl bg-neutral-900/50 p-4 ring-1 ring-white/10">
           <h2 className="mb-3 text-sm font-medium text-neutral-200">Meta</h2>
@@ -59,6 +67,18 @@ export default function StepEditorPage() {
               <Input
                 defaultValue={step.title}
                 onBlur={(e) => patch.mutate({ title: e.target.value })}
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="text-neutral-300">Order</span>
+              <Input
+                type="number"
+                min={0}
+                defaultValue={step.order_index}
+                onBlur={(e) =>
+                  patch.mutate({ order_index: Number(e.target.value) })
+                }
+                className="w-32"
               />
             </label>
             <label className="space-y-1 text-sm">
@@ -156,9 +176,19 @@ export default function StepEditorPage() {
         <div className="rounded-xl bg-neutral-900/50 p-4 ring-1 ring-white/10">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-medium text-neutral-200">Fields</h2>
-            <Button onClick={() => router.push(`/steps/${stepId}/fields`)}>
-              Manage fields
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => router.push(`/steps/${stepId}/fields`)}
+              >
+                Manage fields
+              </Button>
+              <Button
+                onClick={() => router.push(`/steps/${stepId}/fields/new`)}
+              >
+                New field
+              </Button>
+            </div>
           </div>
           <ol className="space-y-2">
             {orderedFields.map((f) => (
@@ -169,31 +199,36 @@ export default function StepEditorPage() {
                 <div>
                   <div className="text-sm">{f.label ?? f.key}</div>
                   <div className="text-xs text-neutral-400">
-                    {f.type} · row {f.row_index ?? 1} col {f.col_index ?? 1}
+                    {f.type} · row {f.row_index ?? 1} col {f.col_index ?? 1}{" "}
+                    span {f.col_span ?? 1}
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => router.push(`/fields/${f._id}`)}
-                >
-                  Edit
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => router.push(`/fields/${f._id}`)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("Delete this field?")) {
+                        removeField.mutate(f._id);
+                      }
+                    }}
+                    disabled={removeField.isPending}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </li>
             ))}
             {(!orderedFields || orderedFields.length === 0) && (
               <li className="text-sm text-neutral-400">No fields yet.</li>
             )}
           </ol>
-        </div>
-      </div>
-
-      <div className="rounded-xl bg-neutral-900/30 p-4 ring-1 ring-white/10">
-        <h2 className="mb-3 text-sm font-medium text-neutral-200">
-          Preview (read-only)
-        </h2>
-        <div className="text-xs text-neutral-400">
-          Build-time preview to be implemented later in Preview page.
         </div>
       </div>
     </div>

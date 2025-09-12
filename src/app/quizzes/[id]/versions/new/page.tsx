@@ -46,14 +46,14 @@ export default function NewVersionPage() {
   const overLimit = currentSum + (weight || 0) > 100;
 
   return (
-    <div className="max-w-md space-y-4">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="rounded-xl bg-neutral-900/50 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ring-1 ring-white/10">
         <h2 className="mb-3 text-sm font-medium text-neutral-200">
           New version
         </h2>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <label className="space-y-1 text-sm">
-            <span className="text-neutral-300">Label</span>
+            <span className="text-neutral-300">Version name</span>
             <Input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
@@ -79,16 +79,18 @@ export default function NewVersionPage() {
             Set as default
           </label>
           {overLimit && (
-            <div className="rounded-md bg-amber-950/40 p-2 text-xs text-amber-300 ring-1 ring-amber-400/30">
+            <div className="rounded-md bg-amber-950/40 p-2 text-xs text-amber-300 ring-1 ring-amber-400/30 md:col-span-2">
               Total weight would exceed 100%.
             </div>
           )}
-          <Button
-            onClick={() => create.mutate()}
-            disabled={!label || overLimit || create.isPending}
-          >
-            {create.isPending ? "Creating..." : "Create"}
-          </Button>
+          <div className="md:col-span-2 flex justify-end">
+            <Button
+              onClick={() => create.mutate()}
+              disabled={!label || overLimit || create.isPending}
+            >
+              {create.isPending ? "Creating..." : "Create"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

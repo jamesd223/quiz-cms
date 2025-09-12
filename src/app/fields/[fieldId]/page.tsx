@@ -32,7 +32,7 @@ export default function FieldDetailPage() {
   const isGroup = data.type === "group";
 
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="rounded-xl bg-neutral-900/50 p-4 ring-1 ring-white/10">
         <h2 className="mb-3 text-sm font-medium text-neutral-200">Field</h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -51,11 +51,24 @@ export default function FieldDetailPage() {
             />
           </label>
           <label className="space-y-1 text-sm">
-            <span className="text-neutral-300">Placeholder</span>
-            <Input
-              defaultValue={data.placeholder ?? ""}
-              onBlur={(e) => patch.mutate({ placeholder: e.target.value })}
-            />
+            <span className="text-neutral-300">Type</span>
+            <select
+              defaultValue={data.type}
+              onChange={(e) =>
+                patch.mutate({ type: e.target.value as Field["type"] })
+              }
+              className="w-full rounded-md bg-neutral-800 px-3 py-2 text-sm outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="input_text">input_text</option>
+              <option value="input_number">input_number</option>
+              <option value="input_email">input_email</option>
+              <option value="input_phone">input_phone</option>
+              <option value="date">date</option>
+              <option value="slider">slider</option>
+              <option value="choice_single">choice_single</option>
+              <option value="choice_multi">choice_multi</option>
+              <option value="group">group</option>
+            </select>
           </label>
           <label className="inline-flex items-center gap-2 text-sm text-neutral-300 md:col-span-2">
             <input
@@ -64,6 +77,37 @@ export default function FieldDetailPage() {
               onChange={(e) => patch.mutate({ required: e.target.checked })}
             />
             Required
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="text-neutral-300">Row</span>
+            <Input
+              type="number"
+              min={1}
+              defaultValue={data.row_index ?? 1}
+              onBlur={(e) =>
+                patch.mutate({ row_index: Number(e.target.value) })
+              }
+            />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="text-neutral-300">Col</span>
+            <Input
+              type="number"
+              min={1}
+              defaultValue={data.col_index ?? 1}
+              onBlur={(e) =>
+                patch.mutate({ col_index: Number(e.target.value) })
+              }
+            />
+          </label>
+          <label className="space-y-1 text-sm">
+            <span className="text-neutral-300">Col span</span>
+            <Input
+              type="number"
+              min={1}
+              defaultValue={data.col_span ?? 1}
+              onBlur={(e) => patch.mutate({ col_span: Number(e.target.value) })}
+            />
           </label>
         </div>
       </div>
